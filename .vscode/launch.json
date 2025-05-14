@@ -1,0 +1,27 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Flask (LeetAI)", // Or whatever your config is called
+            "type": "python",
+            "request": "launch",
+            "module": "flask",
+            "env": {
+                "FLASK_APP": "server.server.py", // Make sure this matches your file
+                "FLASK_DEBUG": "1", // Enables debug mode
+                // --- ADD THIS LINE ---
+                "GOOGLE_APPLICATION_CREDENTIALS": "C:\\Users\\HP\\Downloads\\secret.json" 
+                // --- Replace with the ACTUAL path ---
+            },
+            "args": [
+                "run",
+                // Optional: uncomment if debug is set via env
+                // "--no-debugger",
+                // "--no-reload"
+            ],
+            "jinja": true,
+            "justMyCode": true // Usually default, good for debugging
+        }
+        // ... other configurations ...
+    ]
+}

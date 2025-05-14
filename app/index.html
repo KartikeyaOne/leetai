@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <!-- Updated CSP: Added data: for potential inline SVGs if needed -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; connect-src 'self' http://127.0.0.1:5000; img-src 'self' data:;"/>
+    <title>LeetAI Assistant</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Core Styles -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+    <!-- Use a theme designed for dark backgrounds -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
+    <!-- No inline styles -->
+</head>
+<body>
+    <!-- Ghost Mode Indicator -->
+    <div id="ghost-mode-indicator">Ghost Mode Active</div>
+
+    <!-- Main Scrollable Content Container -->
+    <div class="container" id="main-container">
+      <!-- Dynamic content wrapper -->
+      <main class="tab-content">
+        <!-- Primary View/Pane -->
+        <section id="main" class="tab-pane active show">
+          <h3>Assistant</h3>
+          <p class="subtitle">AI analysis & context. Use keyboard shortcuts for efficiency. Toggle interaction mode (<span class="key-inline">Cmd/Ctrl+G</span>).</p>
+
+          <!-- Card containing AI Response Area -->
+          <div class="card card-response">
+            <h4>AI Response</h4>
+            <!-- Container for actual response OR placeholder/loader -->
+            <div id="response-container" role="document" aria-live="polite">
+              <!-- Initial Placeholder State (Managed by JS) -->
+              <!-- Structure example (JS will generate this):
+              <div class="response-placeholder">
+                <div class="placeholder-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+                 </div>
+                <span class="placeholder-text">Ready for input. Use <span class="key-inline">Cmd/Ctrl+H</span>...</span>
+              </div>
+              -->
+            </div>
+          </div>
+
+          <div class="card">
+            <h4>Keyboard Shortcuts</h4>
+            <div class="shortcut-list">
+                <div class="shortcut-item"><div class="key">Cmd / Ctrl + H</div><div class="action">Capture Screen</div></div>
+                <div class="shortcut-item"><div class="key">Cmd / Ctrl + Return</div><div class="action">Generate Solution</div></div>
+                <div class="shortcut-item"><div class="key">Cmd / Ctrl + G</div><div class="action">Toggle Interactive / Ghost</div></div>
+                <div class="shortcut-item"><div class="key">Cmd / Ctrl + Up/Down</div><div class="action">Scroll Content</div></div>
+                <div class="shortcut-item"><div class="key">Cmd / Ctrl + B</div><div class="action">Toggle Window Visibility</div></div>
+                <div class="shortcut-item"><div class="key">Alt + Arrow Keys</div><div class="action">Move Window Group</div></div>
+                <div class="shortcut-item"><div class="key">Cmd / Ctrl + Q</div><div class="action">Quit Application</div></div>
+            </div>
+          </div>
+        </section>
+        <!-- <section id="settings" class="tab-pane">...</section> -->
+      </main>
+    </div> <!-- End container -->
+
+    <!-- Notification Area -->
+    <div id="notification" role="alert" aria-live="assertive">Notification Message</div>
+
+    <!-- Renderer Script -->
+    <script>
+      if (typeof require === 'function') {
+        const { ipcRenderer } = require('electron');
+        let hljsReady = false; // Initial state
+        const hljsScript = document.querySelector('script[src*="highlight.min.js"]');
+
+        if (hljsScript) {
+          hljsScript.addEventListener('load', () => {
+            hljsReady = true;
+            console.log("Highlight.js loaded.");
+            // Attempt to highlight if content already exists (unlikely on first load, but safe)
+            applySyntaxHighlighting();
+          });
+        } else {
+            console.error("Highlight.js script tag not found!");
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+          console.log("Renderer: DOM Ready");
+
+          // --- Refs & Consts ---
+          const NOTIFICATION_DEFAULTS = { duration: 2500 };
+          const HLJS_APPLIED = 'hljs-applied'; // Class to mark highlighted blocks
+          const PARSE_DELAY = 50; // ms delay before parsing markdown
+
+          const container = document.getElementById("main-container");
+          const responseEl = document.getElementById("response-container");
+          const notificationEl = document.getElementById("notification");
+          const ghostIndicator = document.getElementById("ghost-mode-indicator");
+          const allPanes = document.querySelectorAll('.tab-pane');
+
+          // --- State ---
+          let currentOcrText = "";
+          let notificationTimeout = null;
+          let isParsing = false; // Flag to prevent concurrent parsing
+
+          // --- Utils ---
+          function escapeHtml(unsafe) {
+            if (typeof unsafe !== 'string') return '';
+            // Basic escaping, sufficient for typical text display
+            return unsafe
+                 .replace(/&/g, "&")
+                 .replace(/</g, "<")
+                 .replace(/>/g, ">")
+                 .replace(/"/g, '"')
+                 .replace(/'/g, "'");
+          }
+
+          function showNotification(msg, type = 'info', dur = NOTIFICATION_DEFAULTS.duration) {
+            if (!notificationEl || !msg) return;
+            clearTimeout(notificationTimeout);
+            notificationEl.textContent = msg;
+            notificationEl.setAttribute('data-type', type);
+            notificationEl.classList.add('show');
+            notificationTimeout = setTimeout(() => notificationEl.classList.remove('show'), dur);
+          }
+
+          // --- Placeholder Management ---
+          /**
+           * Updates the response container with a placeholder state.
+           * @param {'idle' | 'loading' | 'message' | 'error'} state The state to display.
+           * @param {string} message The text message to show.
+           * @param {string} [detailsHtml=''] Optional additional HTML (e.g., captured text).
+           */
+          function setPlaceholderState(state, message, detailsHtml = '') {
+            if (!responseEl) return;
+
+            let iconHtml = '';
+            let stateClass = 'response-placeholder'; // Base class
+
+            switch (state) {
+              case 'loading':
+                iconHtml = `<div class="spinner"><div></div><div></div><div></div><div></div></div>`;
+                stateClass += ' loading';
+                break;
+              case 'error':
+                 // Simple error icon (using text or could be SVG)
+                iconHtml = `<div class="placeholder-icon" style="color: var(--color-error);">⚠️</div>`;
+                 stateClass += ' error';
+                break;
+               case 'message': // For general status like 'captured'
+                 // Info icon (using text or could be SVG)
+                 iconHtml = `<div class="placeholder-icon" style="color: var(--color-info);">ℹ️</div>`;
+                 // No special class needed, default styling applies
+                 break;
+              case 'idle':
+              default:
+                // Ready/Idle icon (example using SVG)
+                iconHtml = `<div class="placeholder-icon">
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm-1-5h2v2h-2v-2zm0-8h2v6h-2V7z"></path></svg>
+                            </div>`;
+                // No special class needed, default styling applies
+                break;
+            }
+
+            // Construct the placeholder HTML
+             // Use key-inline for shortcuts within the placeholder text
+             const formattedMessage = message.replace(/`(Cmd\/Ctrl\+\w+)`/g, '<span class="key-inline">$1</span>');
+
+             responseEl.innerHTML = `
+                <div class="${stateClass}">
+                  ${iconHtml}
+                  <span class="placeholder-text">${formattedMessage}</span>
+                </div>
+                ${detailsHtml}
+            `;
+             // Ensure container has the base class for layout, but not markdown class
+             responseEl.className = ''; // Remove markdown-body if present
+          }
+
+
+          // --- Core Logic ---
+          function parseCustomMarkdown(markdownText) {
+            const logPfx="MDParse:"; if(typeof markdownText!=='string')return'<p class="placeholder error">Invalid content received</p>'; if(!markdownText.trim())return'<p class="placeholder">Empty response received</p>'; let html='';let inCode=false;let codeLang='plaintext';let codeContent=''; function fmtInline(txt){if(typeof txt!=='string')return'';let f=escapeHtml(txt);f=f.replace(/\*\*(.+?)\*\*/gs,'<strong>$1</strong>');f=f.replace(/(?<![\\*])\*(.+?)(?<![\\*])\*/gs,'<em>$1</em>');f=f.replace(/`([^`]+?)`/g,'<code class="inline-code">$1</code>');return f;} const lines=markdownText.split('\n');let listType=null;let paraBuf=[]; function flushP(){if(paraBuf.length>0){html+=`<p>${fmtInline(paraBuf.join(' ').trim())}</p>\n`;paraBuf=[];}} function closeL(){if(listType){html+=`</${listType}>\n`;listType=null;}}
+            lines.forEach((line)=>{ const trimLine=line.trim(); const fenceMatch=line.match(/^```(\w*)/); if(fenceMatch){ flushP(); closeL(); if(inCode){const lang=escapeHtml(codeLang.trim().toLowerCase()||'plaintext');const langCls=lang?`language-${lang}`:''; const escCode=escapeHtml(codeContent.replace(/\n$/,'')); html+=`<div class="code-block-wrapper"><div class="code-block-header"><span class="language-name">${lang}</span></div><pre><code class="${langCls}">${escCode}</code></pre></div>\n`;inCode=false;codeContent='';codeLang='plaintext';} else {inCode=true;codeLang=fenceMatch[1]||'plaintext';codeContent='';} return;} if(inCode){codeContent+=line+'\n';return;} if(!trimLine){flushP();closeL();return;} const hMatch=line.match(/^(#{1,6})\s+(.*)/); if(hMatch){flushP();closeL();const lvl=hMatch[1].length;html+=`<h${lvl}>${fmtInline(hMatch[2])}</h${lvl}>\n`;return;} const ulMatch=line.match(/^(\s*)([\*\-\+])\s+(.*)/); if(ulMatch){flushP();if(listType!=='ul'){closeL();html+='<ul>\n';listType='ul';}html+=`<li>${fmtInline(ulMatch[3])}</li>\n`;return;} const olMatch=line.match(/^(\s*)(\d+)\.\s+(.*)/); if(olMatch){flushP();if(listType!=='ol'){closeL();html+='<ol>\n';listType='ol';}html+=`<li>${fmtInline(olMatch[3])}</li>\n`;return;} if(!ulMatch&&!olMatch){closeL();} paraBuf.push(line); }); flushP();closeL(); if(inCode){console.warn(`${logPfx} Unterminated code block`);const lang=escapeHtml(codeLang.trim().toLowerCase()||'plaintext');const langCls=lang?`language-${lang}`:''; const escCode=escapeHtml(codeContent.replace(/\n$/,''));html+=`<p class="error">[Unclosed Code Block]</p><div class="code-block-wrapper"><div class="code-block-header"><span class="language-name">${lang}</span></div><pre><code class="${langCls}">${escCode}</code></pre></div>\n`;} return html;
+          }
+
+          function applySyntaxHighlighting() {
+            if (!hljsReady || typeof hljs === 'undefined') {
+              // console.warn("applySyntaxHighlighting: HLJS not ready.");
+              return; // Don't warn every time if it's just not loaded yet
+            }
+            if (!responseEl) return;
+            try {
+              // Find code blocks that need highlighting
+              const blocks = responseEl.querySelectorAll(`div.code-block-wrapper pre code:not(.${HLJS_APPLIED})`);
+              if (blocks.length > 0) console.log(`HLJS: Found ${blocks.length} blocks to highlight.`);
+              blocks.forEach(block => {
+                // Avoid highlighting empty blocks
+                if (block.textContent?.trim()) {
+                    try {
+                        hljs.highlightElement(block);
+                    } catch(e) {
+                        console.error("HLJS highlighting error:", e, block.className);
+                    }
+                }
+                block.classList.add(HLJS_APPLIED); // Mark as processed
+              });
+            } catch (e) {
+              console.error("Highlight search error:", e);
+            }
+          }
+
+          function displayResponse(resp) {
+            if (isParsing || !responseEl) return;
+            isParsing = true;
+            console.log("Displaying response...");
+            // Show processing message briefly using placeholder
+            setPlaceholderState('loading', 'Processing response...');
+
+            // Use setTimeout to allow the "Processing" message to render before heavy parsing
+            setTimeout(() => {
+              try {
+                const html = (!resp?.trim())
+                  ? '<p class="placeholder error">Received empty response.</p>' // Handle empty response explicitly
+                  : parseCustomMarkdown(resp);
+
+                responseEl.innerHTML = html; // Replace placeholder with parsed content
+                responseEl.className = 'markdown-body'; // Apply markdown styling class
+
+                applySyntaxHighlighting(); // Apply syntax highlighting
+ 
+                if (resp?.trim()) { 
+                  showNotification("AI analysis complete", "success");
+                } else {
+                   showNotification("Received empty response", "warning");
+                }
+              } catch (e) {
+                console.error("Response display error:", e);
+                 const errorMsg = `Failed to display response: ${escapeHtml(e.message)}`;
+                 setPlaceholderState('error', errorMsg, `<details><summary>View Raw Response</summary><pre><code>${escapeHtml(resp || 'N/A')}</code></pre></details>`);
+                showNotification("Error displaying response", "error", 4000);
+              } finally {
+                container?.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to top
+                isParsing = false;
+              }
+            }, PARSE_DELAY);
+          }
+
+          // --- IPC Event Handlers ---
+          function initIPC() {
+            console.log("Init IPC listeners...");
+
+            ipcRenderer.on('update-ghost-mode-ui', (event, isGhostMode) => {
+              if (ghostIndicator) ghostIndicator.style.display = isGhostMode ? 'block' : 'none';
+              document.body.classList.toggle('ghost-mode', isGhostMode);
+            });
+
+            ipcRenderer.on("ocr-result", (event, text) => {
+              currentOcrText = text || "";
+               const detailsHtml = currentOcrText
+                 ? `<details><summary>View Captured Text</summary><pre><code>${escapeHtml(currentOcrText)}</code></pre></details>`
+                 : '';
+              // Update placeholder to show capture success message
+               setPlaceholderState('message', 'Text captured. Analyze with `Cmd/Ctrl+Return`.', detailsHtml);
+              showNotification("Screen captured", "success");
+            });
+
+            ipcRenderer.on("gemini-response", (event, response) => {
+                displayResponse(response); // Handle display logic
+            });
+
+             ipcRenderer.on('set-status-message', (event, message) => {
+               // Use the placeholder to show loading/status messages from main
+               if (message) {
+                 console.log("Status message:", message);
+                 setPlaceholderState('loading', escapeHtml(message));
+               } else {
+                 // If message is empty, revert to idle (or previous state if needed)
+                  setPlaceholderState('idle', 'Ready for input. Use `Cmd/Ctrl+H` to capture, then `Cmd/Ctrl+Return` to analyze.');
+               }
+             });
+
+            ipcRenderer.on("request-ocr-text", (event) => {
+              ipcRenderer.send("ocr-text-response", currentOcrText);
+            });
+
+            ipcRenderer.on("show-notification", (event, data) => {
+              if (data?.message) {
+                showNotification(data.message, data.type, data.duration);
+              }
+            });
+
+            ipcRenderer.on("scroll-main-window-content", (event, direction) => {
+              if (!container) return;
+              const scrollAmount = 80; // Pixels to scroll
+              container.scrollBy({
+                top: direction === "up" ? -scrollAmount : scrollAmount,
+                behavior: 'smooth'
+              });
+            });
+
+            ipcRenderer.on("display-tab", (event, tabId) => {
+              console.log(`Activating tab: ${tabId}`);
+              allPanes.forEach(pane => {
+                const isActive = pane.id === tabId;
+                pane.classList.toggle('active', isActive);
+                // Use requestAnimationFrame for smoother visual transition
+                if (isActive) {
+                    if(pane.style.display !== 'block') pane.style.display = 'block'; // Ensure display block before adding show
+                    requestAnimationFrame(() => pane.classList.add('show'));
+                    container?.scrollTo({ top: 0, behavior: 'auto' }); // Scroll new tab to top instantly
+                } else {
+                    pane.classList.remove('show');
+                    // Optionally set display none after transition (if needed, but opacity works)
+                    // setTimeout(() => { if(!pane.classList.contains('active')) pane.style.display = 'none'; }, 250);
+                }
+              });
+            });
+
+            // Request initial state from main process
+            ipcRenderer.send('request-initial-settings');
+          }
+
+          // --- Run ---
+          initIPC();
+           // Set the initial placeholder state on load
+           setPlaceholderState('idle', 'Ready for input. Use `Cmd/Ctrl+H` to capture, then `Cmd/Ctrl+Return` to analyze.');
+          showNotification("Assistant ready", "info", 1500);
+          console.log("Renderer Init Complete.");
+
+        }); // End DOMContentLoaded
+      } else {
+        console.error("Electron require() not available. Ensure this runs in an Electron renderer process.");
+        // Display error to user in the app window itself
+        document.body.innerHTML = `<div style="padding: 30px; color: var(--color-error); font-family: sans-serif;">
+          <h1>Initialization Error</h1>
+          <p>Could not initialize the application environment. Please ensure you are running this within Electron.</p>
+          </div>`;
+      }
+    </script>
+</body>
+</html>

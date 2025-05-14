@@ -1,0 +1,52 @@
+{
+  "name": "leetai",
+  "version": "1.0.0",
+  "description": "AI to help ace interviews. For leetcode and other online interviews.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "author": "Runtime Innovations",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "28.2.3",
+    "electron-builder": "^26.0.12",
+    "electron-reloader": "1.2.3"
+  },
+  "dependencies": {
+    "axios": "^1.8.4",
+    "electron-log": "^5.3.3",
+    "form-data": "^4.0.2",
+    "highlight.js": "^11.11.1",
+    "marked": "^15.0.7",
+    "native-utils": "file:./native-utils",
+    "node-addon-api": "^8.3.1",
+    "screenshot-desktop": "^1.15.1",
+    "tesseract.js": "^6.0.1"
+  },
+  "build": {
+    "appId": "com.aileet.app",
+    "productName": "Leet AI",
+    "directories": {
+      "output": "dist",
+      "buildResources": "assets"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "index.html",
+      "styles.css",
+      "package.json",
+      "native-utils/**/*",
+      "assets/**/*"
+    ],
+    "asarUnpack": [
+      "**/native-utils/**/*"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    }
+  }
+}

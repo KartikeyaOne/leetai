@@ -1,0 +1,403 @@
+/* HeroSection.module.css */
+
+/* Animations */
+@keyframes auroraShift {
+  0% { background-position: 0% 0%; }
+  50% { background-position: 100% 100%; }
+  100% { background-position: 0% 0%; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-15px) rotate(5deg); }
+  75% { transform: translateY(15px) rotate(-5deg); }
+}
+
+/* More pronounced float for shapes */
+@keyframes shapeFloat {
+  0%, 100% { transform: translateY(0px) rotate(var(--initial-rotate, 0deg)); opacity: var(--initial-opacity, 0.2); }
+  50% { transform: translateY(var(--float-distance, -25px)) rotate(var(--rotate-amount, 10deg)); opacity: var(--hover-opacity, 0.3); }
+}
+
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -150% 0; } /* Start further left */
+  100% { background-position: 250% 0; } /* Go further right */
+}
+
+
+@keyframes dataFlow {
+  0% { transform: translateY(-100%); opacity: 0; }
+  10% { opacity: 0.7; }
+  90% { opacity: 0.7; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+
+@keyframes gridPulse {
+  0%, 100% { opacity: 0.12; }
+  50% { opacity: 0.18; }
+}
+
+@keyframes versionPulse {
+  0%, 100% { box-shadow: 0 0 15px rgba(0, 200, 255, 0.4); transform: scale(1); }
+  50% { box-shadow: 0 0 25px rgba(0, 200, 255, 0.7); transform: scale(1.03); }
+}
+
+@keyframes buttonGlowPulse {
+ 0%, 100% { opacity: 0.7; filter: blur(20px); }
+ 50% { opacity: 0.9; filter: blur(25px); }
+}
+
+/* Enhanced Grid Background */
+.gridBackground {
+  background-image:
+    linear-gradient(to right, rgba(100, 200, 255, 0.5) 0.7px, transparent 0.7px),
+    linear-gradient(to bottom, rgba(100, 200, 255, 0.5) 0.7px, transparent 0.7px);
+  background-size: 30px 30px; /* Slightly larger grid */
+  opacity: 0.15;
+  animation: gridPulse 5s ease-in-out infinite; /* Slower pulse */
+}
+
+/* Floating particles */
+.floatingParticle {
+  position: absolute;
+  top: -100px; /* Start above screen */
+  opacity: 0.2; /* Slightly dimmer start */
+  background: radial-gradient(circle, #6ea8ff 30%, #a56eff 100%); /* Adjusted gradient */
+  border-radius: 50%;
+  filter: blur(8px); /* More blur */
+  z-index: -1;
+  /* Using shapeFloat with different variables */
+  --initial-opacity: 0.1;
+  --hover-opacity: 0.25;
+  --float-distance: -30px;
+  --rotate-amount: 8deg;
+  animation: shapeFloat 15s ease-in-out infinite alternate; /* Use alternate */
+}
+
+
+/* Data Streams Effect */
+.dataStreamContainer {
+  position: absolute;
+  inset: 0; /* Cover entire area */
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: -2; /* Behind shapes */
+  pointer-events: none; /* Don't interfere with mouse */
+}
+
+.dataStream {
+  position: absolute;
+  width: 1.5px; /* Slightly thicker */
+  height: 100px; /* Slightly longer */
+  background: linear-gradient(to bottom, transparent, rgba(0, 200, 255, 0.6), rgba(0, 200, 255, 0.1), transparent); /* Faded tail */
+  animation: dataFlow 15s linear infinite; /* Keep original animation name */
+}
+
+
+/* Version Announcement */
+.versionAnnouncement {
+  position: relative;
+  margin-bottom: 1.5rem; /* 24px */
+  display: flex;
+  justify-content: center;
+  z-index: 10; /* Ensure it's above background elements */
+}
+
+.versionPill {
+  display: inline-block;
+  background: linear-gradient(90deg, #00b3ff, #0062ff);
+  color: white;
+  font-weight: bold;
+  font-size: 0.875rem; /* 14px */
+  padding: 0.4rem 1.2rem; /* Adjust padding */
+  border-radius: 9999px; /* Fully rounded */
+  box-shadow: 0 0 20px rgba(0, 150, 255, 0.5);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  animation: versionPulse 2.5s infinite alternate, float 7s ease-in-out infinite; /* Faster pulse, slightly different float */
+  position: relative;
+  overflow: hidden;
+}
+
+.versionPill::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 150%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.5), /* Slightly less intense shimmer */
+    transparent
+  );
+  transform: skewX(-25deg); /* More skew */
+  animation: shimmer 3.5s infinite linear; /* Faster shimmer */
+}
+
+
+/* Shapes */
+.shapesContainer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: -2; /* Ensure shapes are behind content */
+  pointer-events: none;
+}
+
+.shape {
+  position: absolute;
+  opacity: var(--initial-opacity, 0.2); /* Use CSS variable */
+  filter: blur(var(--shape-blur, 4px)); /* Use CSS variable */
+  /* Using shapeFloat animation with default values */
+   --float-distance: -25px;
+   --rotate-amount: 10deg;
+  animation: shapeFloat 20s infinite alternate;
+}
+
+.circle {
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, hsla(16, 100%, 50%, 0.6), hsla(16, 100%, 75%, 0.6)); /* Using hsla for easier opacity control */
+  top: 15%;
+  left: 10%;
+  --shape-blur: 5px;
+  animation-duration: 25s;
+  --float-distance: -30px;
+  --rotate-amount: -8deg;
+}
+
+.square {
+  width: 150px;
+  height: 150px;
+  background: linear-gradient(135deg, hsla(195, 100%, 50%, 0.6), hsla(195, 100%, 75%, 0.6));
+  bottom: 20%;
+  right: 15%;
+  --initial-rotate: 45deg; /* Apply initial rotation */
+  --shape-blur: 4px;
+  animation-duration: 30s;
+  --float-distance: 20px;
+  --rotate-amount: 55deg; /* Rotate more */
+}
+
+.triangle {
+  width: 0;
+  height: 0;
+  border-left: 120px solid transparent;
+  border-right: 120px solid transparent;
+  border-bottom: 200px solid hsla(130, 100%, 70%, 0.45); /* Adjusted color/opacity */
+  top: 60%;
+  left: 25%;
+  --shape-blur: 6px; /* More blur for triangle */
+  animation-duration: 22s;
+  --float-distance: -20px;
+  --rotate-amount: -15deg;
+}
+
+.hexagon {
+  /* Note: Hexagon needs :before/:after, which can't inherit animation easily */
+  /* Consider SVG for complex shapes if complex animation is needed */
+  width: 180px;
+  height: 104px;
+  background: linear-gradient(135deg, hsla(260, 100%, 75%, 0.6), hsla(230, 100%, 75%, 0.6));
+  position: absolute;
+  top: 30%;
+  right: 20%;
+  --shape-blur: 4px;
+  animation-duration: 28s;
+  --float-distance: 25px;
+  --rotate-amount: 12deg;
+}
+
+.hexagon:before,
+.hexagon:after {
+  content: "";
+  position: absolute;
+  width: 0;
+  border-left: 90px solid transparent;
+  border-right: 90px solid transparent;
+}
+
+.hexagon:before {
+  bottom: 100%;
+  border-bottom: 52px solid hsla(260, 100%, 75%, 0.6); /* Match background part */
+}
+
+.hexagon:after {
+  top: 100%;
+  border-top: 52px solid hsla(230, 100%, 75%, 0.6); /* Match background part */
+}
+
+.diamond {
+  width: 160px;
+  height: 160px;
+  background: linear-gradient(135deg, hsla(340, 100%, 63%, 0.6), hsla(340, 100%, 75%, 0.6));
+  position: absolute;
+  top: 45%;
+  left: 65%;
+  --initial-rotate: 45deg;
+  --shape-blur: 3px;
+  animation-duration: 26s;
+  --float-distance: -28px;
+  --rotate-amount: 35deg;
+}
+
+.star {
+  /* Note: Star needs :after, tricky to animate consistently */
+  /* Consider SVG */
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-left: 50px solid transparent;
+  border-right: 50px solid transparent;
+  border-bottom: 100px solid hsla(50, 100%, 75%, 0.45);
+  top: 25%;
+  left: 45%;
+  --shape-blur: 5px;
+  animation-duration: 32s;
+  --float-distance: 30px;
+  --rotate-amount: -5deg;
+}
+
+.star:after {
+  content: "";
+  position: absolute;
+  left: -50px;
+  top: 35px;
+  width: 0;
+  height: 0;
+  border-left: 50px solid transparent;
+  border-right: 50px solid transparent;
+  border-top: 100px solid hsla(50, 100%, 75%, 0.45);
+}
+
+/* --- ADDED OFFSET SHAPES --- */
+.shapeOffset1 {
+  /* Example: Offset Circle */
+  top: 70%;
+  left: 80%;
+  transform: scale(0.8); /* Make it smaller */
+  animation-delay: 1.5s;
+  animation-duration: 28s; /* Different duration */
+}
+
+.shapeOffset2 {
+   /* Example: Offset Square */
+  top: 10%;
+  left: 30%;
+  transform: scale(0.7) rotate(15deg); /* Smaller and different rotation */
+  animation-delay: 0.8s;
+  animation-duration: 35s; /* Different duration */
+}
+
+.shapeOffset3 {
+  /* Example: Offset Triangle */
+  bottom: 15%;
+  left: 5%;
+  transform: scale(1.1) rotate(-10deg); /* Larger and different rotation */
+  animation-delay: 2.2s;
+  animation-duration: 24s; /* Different duration */
+}
+/* --- END OFFSET SHAPES --- */
+
+
+/* Text Highlight Glow */
+.textHighlight {
+  position: absolute;
+  width: 120%; /* Wider glow */
+  height: 120%; /* Taller glow */
+  top: -10%; /* Center it better */
+  left: -10%; /* Center it better */
+  background: radial-gradient(ellipse at center, hsla(195, 100%, 60%, 0.45) 0%, transparent 65%); /* Adjusted color, size */
+  filter: blur(35px); /* More blur */
+  opacity: 0.7;
+  z-index: -1;
+  animation: pulse 4s infinite ease-in-out; /* Use ease-in-out */
+}
+
+/* Glowing Text Effect */
+.glowingText {
+  text-shadow:
+    0 0 10px rgba(255, 255, 255, 0.5), /* Base white glow */
+    0 0 25px rgba(200, 230, 255, 0.4), /* Subtle blueish glow */
+    0 0 50px rgba(150, 220, 255, 0.2), /* Wider blue glow */
+    0 2px 5px rgba(0, 0, 0, 0.2); /* Subtle drop shadow for definition */
+  background: linear-gradient(to bottom, #ffffff 60%, #e0e8f0 100%); /* Slightly off-white gradient */
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent; /* Make base text transparent */
+  position: relative;
+}
+
+/* Silver Text Effect */
+.silverText {
+  background: linear-gradient(170deg, #ffffff 20%, #d8d8d8 40%, #b0b0b0 60%, #c8c8c8 80%, #f0f0f0 100%); /* More complex gradient for metallic look */
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  display: inline-block; /* Important for background clip */
+  filter: drop-shadow(0 1px 5px rgba(220, 220, 230, 0.5)); /* Subtle bright shadow */
+  text-shadow: none; /* Override parent text-shadow */
+}
+
+
+/* Button Styles */
+.ultimateCTAButton {
+  position: relative; /* Needed for absolute children */
+  isolation: isolate; /* Create new stacking context */
+  overflow: hidden; /* Clip pseudo-elements */
+  /* Ensure text is above */
+  color: white; /* Set explicit text color */
+  z-index: 2; /* Above background/border */
+}
+
+/* Span elements inside button need z-index */
+.ultimateCTAButton span {
+   position: relative;
+   z-index: 2;
+}
+
+.buttonGlow {
+  position: absolute;
+  inset: -8px; /* Slightly larger glow area */
+  z-index: 0; /* Behind border and bg */
+  background: linear-gradient(60deg, #12c2e9, #c471ed, #f64f59, #c471ed, #12c2e9); /* More stops for smoother cycle */
+  background-size: 300% 300%; /* Larger size for smoother animation */
+  filter: blur(25px); /* Increased blur */
+  opacity: 0.7;
+  border-radius: 14px; /* Match outer radius + inset */
+  animation: buttonGlowPulse 2.5s infinite alternate ease-in-out, shimmer 4s infinite linear; /* Combine pulse and slow shimmer */
+}
+
+.buttonBorder {
+  position: absolute;
+  inset: 0;
+  z-index: 1; /* Above glow, below bg */
+  padding: 2px; /* Thickness of the border */
+  border-radius: 8px; /* Outer radius */
+  background: linear-gradient(60deg, #12c2e9, #c471ed, #f64f59, #c471ed, #12c2e9); /* Match glow gradient */
+  background-size: 300% 100%; /* Wider for shimmer */
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); /* Add vendor prefix */
+  mask-composite: exclude;
+  -webkit-mask-composite: xor; /* Use 'xor' for wider browser compatibility */
+  animation: shimmer 2.5s infinite linear; /* Slightly faster border shimmer */
+}
+
+.buttonBg {
+  position: absolute;
+  inset: 2px; /* Should match border padding */
+  z-index: 1; /* Above glow, below text, same level as border mask content */
+  border-radius: 6px; /* Inner radius (outer - padding) */
+  background: linear-gradient(to bottom, #253346, #111827); /* Darker gradient */
+}

@@ -1,0 +1,535 @@
+/* styles.css */
+:root {
+  /* Professional Dark Theme (Black/White/Blue - GitHub Dark Inspired) */
+  --bg-primary: #0d1117;
+  --bg-secondary: #161b22;
+  --bg-tertiary: #21262d;
+  --bg-code: #1a1f26; /* Slightly different for code blocks */
+
+  --text-primary: #e6edf3;
+  --text-secondary: #8d96a0;
+  --text-tertiary: #6e7681; /* Placeholders, muted icons */
+
+  --accent-primary: #58a6ff; /* Primary Blue */
+  --accent-secondary: #388bfd; /* Darker Blue */
+  --accent-hover: #79c0ff; /* Lighter Blue */
+
+  --border-color: #30363d;
+  --border-hover: #444c56;
+  --border-accent: var(--accent-secondary);
+
+  --color-success: #238636;
+  --color-error: #cf222e;
+  --color-warning: #bb8009;
+  --color-info: var(--accent-primary);
+
+  --radius: 6px;
+  --radius-sm: 4px;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 3px 6px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 5px 15px rgba(0, 0, 0, 0.3);
+  --transition-duration: 0.2s;
+  --transition-timing: ease-in-out;
+
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
+  --font-mono: "JetBrains Mono", Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+/* --- Base & Reset --- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  outline: none;
+}
+html {
+  font-size: 15px; /* Base font size */
+}
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  overflow: hidden; /* Prevent body scroll, handle scrolling in .container */
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* --- Scrollbar --- */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  border: 1px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+/* --- Layout --- */
+.container {
+  position: relative;
+  height: 100vh;
+  overflow-y: auto; /* Enable vertical scrolling ONLY for this container */
+  overflow-x: hidden;
+  background-color: var(--bg-primary);
+  box-sizing: border-box;
+}
+.tab-content {
+  width: 100%;
+}
+.tab-pane {
+  padding: 24px; /* Increased padding */
+  display: none;
+  opacity: 0;
+  transition: opacity 0.25s var(--transition-timing);
+  box-sizing: border-box;
+  min-height: calc(100vh - 48px); /* Ensure pane fills viewport height minus padding */
+}
+.tab-pane.active.show {
+  display: block;
+  opacity: 1;
+}
+
+/* --- Typography --- */
+h3 {
+  font-size: 1.5rem; /* 22.5px */
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 18px 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+  letter-spacing: -0.01em;
+}
+h4 {
+  font-size: 1.15rem; /* ~17px */
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 14px;
+}
+p {
+  margin-bottom: 1em;
+  line-height: 1.7;
+  max-width: 75ch; /* Limit line length for readability */
+}
+.subtitle {
+  color: var(--text-secondary);
+  font-size: 0.95rem; /* ~14px */
+  margin: -14px 0 24px 0; /* Adjust spacing below h3 */
+}
+
+/* --- Card --- */
+.card {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-sm);
+  transition: border-color var(--transition-duration) var(--transition-timing),
+    box-shadow var(--transition-duration) var(--transition-timing);
+}
+.card:hover {
+  border-color: var(--border-hover);
+}
+
+/* --- AI Response Card Specifics & Placeholders/Loaders --- */
+.card-response { /* Style the specific card if needed */
+  min-height: 150px; /* Ensure card has decent minimum height */
+  display: flex; /* Allow content like placeholder to center */
+  flex-direction: column;
+}
+
+#response-container {
+  flex-grow: 1; /* Allow container to fill card height */
+  display: flex; /* Enable flex for centering placeholder */
+  flex-direction: column;
+  justify-content: center; /* Center placeholder vertically */
+  min-height: 100px; /* Base height for placeholder/loader area */
+}
+
+/* Styles for the placeholder container itself */
+.response-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center horizontally */
+  justify-content: center; /* Center vertically */
+  gap: 14px; /* Space between icon/spinner and text */
+  text-align: center;
+  color: var(--text-tertiary);
+  font-size: 0.95rem;
+  padding: 20px 10px; /* Vertical and horizontal padding */
+  min-height: inherit; /* Inherit min-height from #response-container */
+  width: 100%; /* Take full width */
+}
+
+/* Styles for the icon within the placeholder */
+.response-placeholder .placeholder-icon {
+  width: 28px;
+  height: 28px;
+  color: var(--text-tertiary); /* Use tertiary color for icons */
+  opacity: 0.7;
+}
+/* Make SVG inside the icon container scale */
+.response-placeholder .placeholder-icon svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+
+/* Styles for the text within the placeholder */
+.response-placeholder .placeholder-text {
+  max-width: 90%; /* Prevent text getting too wide */
+  line-height: 1.5;
+  font-style: italic; /* Default italic for idle/info messages */
+}
+
+/* Specific styling when in loading state */
+.response-placeholder.loading .placeholder-text {
+  color: var(--text-secondary); /* Slightly brighter for loading text */
+  font-style: normal;
+  font-weight: 500;
+}
+/* Specific styling when showing an error */
+.response-placeholder.error .placeholder-text {
+  color: var(--color-error);
+  font-style: normal;
+  font-weight: 500;
+}
+
+
+/* Simple Spinner Animation */
+.spinner {
+  /* No changes needed, just ensure it's placed correctly by JS */
+  display: inline-block; /* Keep original display */
+  position: relative;
+  width: 30px;
+  height: 30px;
+  /* We'll place this using flexbox gap, no absolute positioning needed here */
+}
+.spinner div {
+  box-sizing: border-box;
+  display: block;
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  margin: 3px; /* Center the rings */
+  border: 3px solid var(--accent-primary);
+  border-radius: 50%;
+  animation: spinner-anim 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  border-color: var(--accent-primary) transparent transparent transparent; /* Color the arc */
+}
+.spinner div:nth-child(1) { animation-delay: -0.45s; }
+.spinner div:nth-child(2) { animation-delay: -0.3s; }
+.spinner div:nth-child(3) { animation-delay: -0.15s; }
+
+@keyframes spinner-anim {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* --- Shortcut List --- */
+.shortcut-list {
+  margin-top: 10px;
+}
+.shortcut-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding: 10px 0;
+  border-bottom: 1px dashed var(--border-color);
+}
+.shortcut-item:last-child {
+  border-bottom: none;
+}
+.key {
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-right: 16px;
+  text-align: center;
+  white-space: nowrap;
+  box-shadow: var(--shadow-sm);
+}
+.key-inline {
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 1px 5px;
+  font-family: var(--font-mono);
+  font-size: 0.85em; /* Relative to parent */
+  color: var(--text-secondary);
+  vertical-align: baseline;
+}
+.action {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  text-align: right;
+}
+
+/* --- Markdown & Code Blocks --- */
+.markdown-body { /* Applied to #response-container when content is loaded */
+  font-size: 1rem; /* 15px */
+  line-height: 1.7;
+  /* Reset flex properties applied for placeholder centering */
+  display: block;
+  justify-content: initial;
+  text-align: left;
+}
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3 {
+  color: var(--text-primary);
+  margin: 1.6em 0 0.8em 0;
+  font-weight: 600;
+  padding-bottom: 0.4em;
+  border-bottom: 1px solid var(--border-color);
+}
+.markdown-body h1 { font-size: 1.6rem; }
+.markdown-body h2 { font-size: 1.4rem; }
+.markdown-body h3 { font-size: 1.2rem; }
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+  color: var(--text-primary);
+  margin: 1.3em 0 0.7em 0;
+  font-weight: 600;
+}
+.markdown-body h4 { font-size: 1.1rem; }
+.markdown-body h5 { font-size: 1.05rem; }
+.markdown-body h6 {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.markdown-body strong {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.markdown-body em {
+  font-style: italic;
+}
+.markdown-body ul,
+.markdown-body ol {
+  padding-left: 2em; /* Indentation for lists */
+  margin: 1.1em 0;
+}
+.markdown-body li {
+  margin-bottom: 0.6em;
+}
+.markdown-body li > p {
+  margin-bottom: 0.3em; /* Tighter paragraphs within list items */
+}
+.markdown-body p {
+  margin-bottom: 1.1em; /* Slightly more paragraph spacing */
+  max-width: 75ch;
+}
+.markdown-body a {
+  color: var(--accent-primary);
+  text-decoration: none;
+  transition: color var(--transition-duration);
+}
+.markdown-body a:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+.inline-code,
+.markdown-body code:not(pre code) {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  color: var(--text-primary);
+  background-color: var(--bg-tertiary);
+  padding: 0.2em 0.5em;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  white-space: nowrap;
+  vertical-align: baseline;
+}
+/* --- Details / Summary (for captured text etc.) --- */
+details {
+  background-color: transparent; /* Blend with card background */
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 12px 18px;
+  margin: 1.2em 0;
+}
+details summary {
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--text-secondary);
+  list-style: inside; /* Keep marker inside */
+  transition: color var(--transition-duration);
+}
+details[open] summary {
+  color: var(--text-primary);
+  margin-bottom: 10px; /* Space before content */
+}
+/* Style pre/code specifically inside details, potentially differently than markdown */
+details pre {
+  margin: 0; /* Reset margin */
+  background-color: var(--bg-code);
+  padding: 1em;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  overflow-x: auto;
+}
+details pre code {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  background: transparent !important;
+  border: none;
+  padding: 0;
+  white-space: pre-wrap; /* Allow wrapping for long captured text */
+  word-break: break-all; /* Force breaks if needed */
+  color: var(--text-secondary); /* Muted color for raw text */
+}
+/* --- Code Block Specific Styles --- */
+.code-block-wrapper {
+  position: relative; /* For potential future elements like copy buttons */
+  margin: 1.6em 0;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-color);
+  overflow: hidden; /* Clip contents to rounded corners */
+  box-shadow: var(--shadow-sm);
+  background-color: var(--bg-code); /* Set background here */
+}
+.code-block-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Space out lang name and potential button */
+  padding: 8px 15px;
+  background-color: var(--bg-secondary); /* Slightly different header bg */
+  border-bottom: 1px solid var(--border-color);
+}
+.language-name {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+/* Adjustments for pre/code within the markdown specifically for code blocks */
+.markdown-body .code-block-wrapper pre {
+  margin: 0; /* Remove default pre margins */
+  padding: 1em;
+  background-color: transparent; /* Inherit from wrapper */
+  overflow-x: auto;
+  border: none; /* Remove borders */
+  border-radius: 0; /* No radius inside */
+  color: var(--text-primary); /* Ensure code text color */
+}
+/* Target the code element generated by highlight.js */
+.markdown-body .code-block-wrapper pre code.hljs {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  display: block; /* Ensure block display */
+  white-space: pre; /* Preserve whitespace */
+  background: transparent !important; /* Override HLJS background */
+  padding: 0; /* Reset padding */
+  border: none; /* Reset border */
+  border-radius: 0; /* Reset radius */
+  vertical-align: initial; /* Reset vertical align */
+  color: inherit; /* Inherit color */
+}
+.raw-response {
+  margin-top: 1em;
+  border-top: 1px dashed var(--border-color);
+  padding-top: 1em;
+}
+.raw-response p {
+  font-weight: bold;
+  color: var(--text-secondary);
+  font-size: 0.9em;
+  margin-bottom: 0.5em;
+}
+
+/* --- Notification --- */
+#notification {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 20px;
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--bg-primary); /* Default text color (for info) */
+  background-color: var(--color-info); /* Default background */
+  box-shadow: var(--shadow-lg);
+  z-index: 1001;
+  max-width: 90%;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none; /* Don't intercept clicks when hidden */
+  transition: opacity 0.3s var(--transition-timing),
+    transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); /* Add transform transition */
+  /* Start slightly off-screen */
+  transform: translateX(-50%) translateY(20px);
+}
+#notification.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0); /* Move into view */
+  pointer-events: auto;
+}
+#notification[data-type="success"] {
+  background-color: var(--color-success);
+  color: #fff;
+}
+#notification[data-type="error"] {
+  background-color: var(--color-error);
+  color: #fff;
+}
+#notification[data-type="warning"] {
+  background-color: var(--color-warning);
+  color: var(--bg-primary); /* Dark text on yellow */
+}
+#notification[data-type="info"] {
+  background-color: var(--color-info);
+  color: var(--bg-primary); /* Dark text on light blue */
+}
+
+/* --- Ghost Mode Indicator --- */
+#ghost-mode-indicator {
+  position: absolute; /* Position relative to body/viewport */
+  top: 8px;
+  right: 8px;
+  background-color: rgba(33, 38, 45, 0.8); /* Semi-transparent bg */
+  backdrop-filter: blur(3px); /* Blur background behind it */
+  -webkit-backdrop-filter: blur(3px);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  padding: 3px 7px;
+  font-size: 9px; /* Very small */
+  border-radius: var(--radius-sm);
+  z-index: 1000;
+  pointer-events: none; /* Don't interact with it */
+  display: none; /* Hidden by default */
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* --- Error Text (Generic) --- */
+.error {
+  color: var(--color-error);
+  font-weight: 500;
+  font-size: 0.95em;
+}
