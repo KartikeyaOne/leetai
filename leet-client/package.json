@@ -5,9 +5,10 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "build": "electron-builder"
+    "build": "electron-builder",
+    "rebuild-native": "electron-rebuild -f -w ./native-utils"
   },
-  "author": "Runtime Innovations",
+  "author": "Kartikeya Sharma",
   "license": "ISC",
   "devDependencies": {
     "electron": "28.2.3",
