@@ -11,7 +11,7 @@ The application is designed to be "invisible" during normal operation – it doe
 
 ## Core Features
 
-*   **Stealth Operation:** Runs as a transparent, non-focusable overlay. Clicks pass through to underlying applications. Includes a custom C++ native module (if applicable, or remove this if not yet implemented) to further enhance its ability to remain hidden from browser-based screen recording systems.
+*   **Stealth Operation:** Runs as a transparent, non-focusable overlay. Clicks pass through to underlying applications. Includes a custom C++ native module to further enhance its ability to remain hidden from browser-based screen recording systems.
 *   **Keyboard-Centric Design:** All primary interactions are handled via global keyboard shortcuts for maximum efficiency.
 *   **Screen Capture & OCR:** Capture on-screen text content using robust OCR capabilities provided by the backend server.
 *   **AI Analysis:** Submit captured text to a powerful AI model (via the backend server, defaulting to Google Gemini API) for:
@@ -19,7 +19,7 @@ The application is designed to be "invisible" during normal operation – it doe
     *   Text summarization
     *   Problem-solving assistance
     *   And more, depending on the AI's capabilities.
-*   **Dynamic Content Display:** The assistant window dynamically adjusts its height to fit the AI's response, with keyboard-driven scrolling for longer content.
+*   **Dynamic Content Display:** The content height and width are fixed, but you can move the content around and even scroll up and down the content using shortcut keys.
 *   **Self-Hosted Backend:** Primarily designed to work with its dedicated, self-hostable backend server for OCR and AI processing, ensuring user control over data and API usage.
 *   **Cross-Platform (Electron):** Built with Electron for potential compatibility across Windows, macOS, and Linux.
 
@@ -34,7 +34,7 @@ In a world of distracting UIs, LeetAI Assistant aims to be the opposite. It's fo
 ## Tech Stack
 
 *   **Client (`leetai-client` directory):** Electron, HTML, CSS, JavaScript.
-    *   *(Optional: Mention C++ native module if it's a core, buildable part)*
+    *   *(C++ native module, buildable part)*
 *   **Backend Server (`leetai-server` directory):** Node.js, Express.js.
 *   **AI Integration (via Server):** Configurable through server environment variables, defaults to Google Gemini API.
 *   **OCR Integration (via Server):** Configurable through server environment variables, capable of using various OCR services.
@@ -56,7 +56,7 @@ This project consists of two main parts: the `leetai-client` (Electron applicati
 1.  **Navigate to the server directory:**
     Assuming you have cloned the main `leetai` repository:
     ```bash
-    cd leetai/leetai-server 
+    cd leetai-server 
     ```
 
 2.  **Install Dependencies:**
@@ -67,11 +67,10 @@ This project consists of two main parts: the `leetai-client` (Electron applicati
 3.  **Configure Environment Variables:**
     *   Locate the `.env.example` (or similar, e.g., `sample.env`) file in the `leetai-server` directory.
     *   Make a copy of this file and rename it to `.env`.
-    *   Open the `.env` file and fill in your API keys and any other required configuration values. For example:
+    *   Open the `.env copy` file and fill in your API keys and any other required configuration values. For example:
         ```env
         PORT=5000
         GEMINI_API_KEY="YOUR_GEMINI_API_KEY_HERE"
-        OCR_PROVIDER="your_chosen_ocr_provider" # e.g., "google_cloud_vision"
         OCR_API_KEY="YOUR_OCR_SERVICE_API_KEY_HERE"
         # ... any other server-specific configurations ...
         ```
@@ -88,7 +87,7 @@ This project consists of two main parts: the `leetai-client` (Electron applicati
 1.  **Navigate to the client directory:**
     Open a **new terminal window/tab**. From the root of the `leetai` repository:
     ```bash
-    cd leetai/leetai-client
+    cd leetai-client
     ```
 
 2.  **Install Dependencies:**
@@ -136,13 +135,10 @@ All interactions with LeetAI Assistant are performed via global keyboard shortcu
 
 Contributions are highly welcome! Whether it's bug reports, feature requests, documentation improvements, or code contributions, please feel free to open an issue or submit a pull request on the [GitHub repository](https://github.com/KartikeyaOne/leetai).
 
-Before contributing, please take a moment to review the `CONTRIBUTING.md` file (if available) for guidelines.
 
 ## License
 
 This project is licensed under the **GNU General Public License v2.0**. See the [LICENSE](./LICENSE) file for the full license text.
-
-*(Make sure to include the GPL-2.0.txt file as `LICENSE` in your repository root.)*
 
 ## Acknowledgements
 
