@@ -1,8 +1,6 @@
 # Contributing to LeetAI Assistant
 
-Thank you for your interest in contributing to LeetAI Assistant. This is a monorepo containing both the desktop client (`leetai-client`) and the backend server (`leetai-server`). We welcome contributions of all kinds, including code, documentation, issue reporting, and feature suggestions.
-
----
+Thank you for your interest in contributing to LeetAI Assistant. This monorepo contains both the desktop client (`leetai-client`) and the backend server (`leetai-server`). We welcome contributions in the form of code, documentation, issue reporting, and feature suggestions.
 
 ## Repository Structure
 
@@ -13,11 +11,9 @@ leetai/
 ├── README.md
 ├── CONTRIBUTING.md
 
-yaml
+bash
 Copy
 Edit
-
----
 
 ## Getting Started
 
