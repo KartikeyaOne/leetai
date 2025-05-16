@@ -1,7 +1,12 @@
 # LeetAI Assistant
 
 [![LeetAI Assistant Logo](https://github.com/KartikeyaOne/leetai/blob/main/leet-client/assets/leetailogo.png)](https://github.com/KartikeyaOne/leetai)
-<!-- Replace the placeholder.com URL above with a direct link to your logo/banner image if you have one -->
+
+
+### 🎥 Demo Video
+
+https://github.com/KartikeyaOne/leetai/blob/main/leet-client/assets/VID20250515122446.mp4
+
 
 LeetAI Assistant is a discreet, keyboard-driven desktop application designed to provide on-demand AI analysis and context for on-screen content. It operates with a focus on efficiency and minimal intrusion, allowing users to quickly capture screen regions, extract text via OCR, and submit it for AI-powered insights without breaking their workflow.
 
