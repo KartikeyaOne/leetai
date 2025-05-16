@@ -20,7 +20,7 @@ Edit
 ### 1. Fork and Clone the Repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/leetai.git
+git clone https://github.com/KartikeyaOne/leetai.git
 cd leetai
 2. Install Dependencies
 Backend Setup (leetai-server)
