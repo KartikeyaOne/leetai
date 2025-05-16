@@ -15,7 +15,7 @@ export default function Home() {
         <HeroSection />
         <FeaturesSection />
         <HowItWorksSection />
-        <PricingSection /> {/* Add the pricing section here */}
+        {/* <PricingSection /> Add the pricing section here */}
         <CTASection />
       </main>
       <Footer />

@@ -1,48 +1,49 @@
 "use client"; // Needed for Framer Motion
 
 import { motion } from 'framer-motion';
-// Import specific icons from Lucide Icons
+// Import specific icons from Lucide Icons based on README Core Features
 import {
-  LuEyeOff,       // Undetectable
-  LuCpu,          // Real-Time Solutions
-  LuNetwork,      // Seamless Integration
-  LuBrainCircuit, // Adaptive AI
-  LuKeyboard,     // Efficient UX
-  LuTarget        // Redefining Assessments
+  LuEyeOff,       // Stealth Operation
+  LuKeyboard,     // Keyboard-Centric Design
+  LuScanText,     // Screen Capture & OCR
+  LuBrainCircuit, // AI Analysis
+  LuMove,         // Dynamic Content Display
+  LuServer,       // Self-Hosted Backend
+  LuLaptop        // Cross-Platform (Electron)
 } from 'react-icons/lu';
 
-// --- Humanized Features Content ---
+// --- Features Content based on README.md Core Features ---
 const features = [
   {
-    title: "Fly Under the Radar",
-    description: "LeetAI works completely undetected. Interviewers, proctors, and anti-cheat software won't know it's there. It just runs quietly in the background.",
-    icon: LuEyeOff // Stay hidden
+    title: "Stealth Operation",
+    description: "Runs as a transparent, non-focusable overlay. Clicks pass through, and it's designed to remain hidden from screen recording systems.",
+    icon: LuEyeOff
   },
   {
-    title: "Instant Solutions, On Demand",
-    description: "Just grab a quick screenshot of the problem. LeetAI instantly gives you accurate answers with easy-to-understand explanations. Solve problems faster and sound like a pro.",
-    icon: LuCpu // Get answers fast
+    title: "Keyboard-Centric Design",
+    description: "All primary interactions are handled via global keyboard shortcuts for maximum efficiency, keeping you in the flow.",
+    icon: LuKeyboard
   },
   {
-    title: "Works Everywhere You Do",
-    description: "Use it seamlessly with Zoom, CoderPad, CodeSignal, Teams, LeetCode, HackerRank, Codeforces, online exams – pretty much anywhere you need it.",
-    icon: LuNetwork // Connects anywhere
+    title: "Screen Capture & OCR",
+    description: "Capture on-screen text content using robust OCR capabilities provided by your self-hosted backend server.",
+    icon: LuScanText
   },
   {
-    title: "Smart AI Gets It Right",
-    description: "Our system uses multiple AI models and cleverly picks the best one for your specific problem, ensuring you always get top-notch solutions.",
-    icon: LuBrainCircuit // Intelligent problem-solving
+    title: "AI Analysis",
+    description: "Submit captured text to a powerful AI (e.g., Google Gemini) for code explanation, generation, summarization, and problem-solving.",
+    icon: LuBrainCircuit
   },
   {
-    title: "Simple & Stealthy Controls",
-    description: "Handy keyboard shortcuts let you capture, generate, and hide LeetAI in a flash. It stays out of sight, out of mind – until you need it.",
-    icon: LuKeyboard // Easy to use
+    title: "Dynamic Content Display",
+    description: "Move the assistant window and scroll through content using shortcuts, all within a consistently sized overlay.",
+    icon: LuMove
   },
   {
-    title: "Beyond Memorization",
-    description: "Tired of just memorizing answers? LeetAI helps you focus on *applying* knowledge, offering smart assistance right when you need it.",
-    icon: LuTarget // Focus on understanding
-  }
+    title: "Self-Hosted Backend",
+    description: "Primarily works with its dedicated, self-hostable backend, ensuring you control your data and API usage.",
+    icon: LuServer
+  },
 ];
 
 // Animation Variants for Staggering
@@ -70,7 +71,11 @@ const cardVariants = {
 
 const FeaturesSection = () => {
   return (
-    <section id="features" className="bg-black py-20 lg:py-32 relative overflow-hidden">
+    <section
+      id="features"
+      // REDUCED PADDING HERE: Was py-20 lg:py-32, now py-16 lg:py-24
+      className="bg-black  relative overflow-hidden"
+    >
        {/* Optional Subtle Background Mesh Gradient */}
         <div
           aria-hidden="true"
@@ -89,15 +94,13 @@ const FeaturesSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.5 }} // Trigger when 50% is visible
           transition={{ duration: 0.6, ease: 'easeOut' }}
-          className="text-center mb-16 md:mb-20"
+          className="text-center mb-16 md:mb-20" // This margin is for space between header and grid
         >
-          {/* --- Humanized Header --- */}
           <h2 className="text-4xl md:text-5xl lg:text-6xl leading-tight font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-gray-200 via-white to-gray-400 mb-4">
-            What Makes LeetAI Different?
+            Core Features of LeetAI
           </h2>
-          {/* --- Humanized Description --- */}
           <p className="text-lg md:text-xl text-gray-400 max-w-3xl mx-auto">
-            Check out the powerful features that give you an undetectable edge, combining stealth with smart, real-time assistance.
+            Discover how LeetAI combines stealth, efficiency, and powerful AI to provide on-demand insights for your on-screen content.
           </p>
         </motion.div>
 
@@ -134,17 +137,14 @@ const FeaturesSection = () => {
 
                 {/* Icon Container */}
                 <div className="mb-5 inline-block p-3 rounded-lg border border-gray-700/80 bg-gradient-to-br from-gray-700/70 to-gray-800/60 group-hover:border-gray-500/90 transition-colors duration-300">
-                  {/* Render the specific icon for this feature */}
                   <IconComponent className="w-6 h-6 text-gray-200 group-hover:text-white transition-colors duration-300" />
                 </div>
 
                 {/* Text Content */}
                 <h3 className="text-xl font-semibold text-gray-100 mb-2">
-                  {/* Feature Title (Humanized) */}
                   {feature.title}
                 </h3>
                 <p className="text-sm text-gray-400 leading-relaxed">
-                  {/* Feature Description (Humanized) */}
                   {feature.description}
                 </p>
               </motion.div>
